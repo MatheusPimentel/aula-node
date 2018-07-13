@@ -82,22 +82,7 @@
 
     <div class="row participantes" id="participantes" style="display:none">
         <div class="col-md-1"></div>
-        <div class="col-md-10">
-					<span class="participante">
-						<img src="/public/images/ico_usuario.png"/>
-						Jorge
-					</span>
-
-            <span class="participante">
-						<img src="/public/images/ico_usuario.png"/>
-						José
-					</span>
-
-            <span class="participante">
-						<img src="/public/images/ico_usuario.png"/>
-						Fernando
-					</span>
-        </div>
+        <div class="col-md-10" id="pessoas"> </div>
         <div class="col-md-1"></div>
 
     </div>
@@ -106,16 +91,16 @@
 <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
     <div class="container">
         <div class="panel-body campo-mensagem">
-            <form>
-                <div class="col-md-12">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Mensagem">
-                        <span class="input-group-btn">
-									<button class="btn btn-default" type="button">></button>
-								</span>
-                    </div>
+            <div class="col-md-12">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Mensagem" id="mensagem">
+                    <input type="hidden" value="<%=dadosForm.apelido%>" id="apelido">
+                    <input type="hidden" value="0" id="apelido_atualizado_nos_clientes">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" id="enviar_mensagem">></button>
+                    </span>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </nav>
@@ -128,6 +113,20 @@
 
 <script>
     var socket = io('http://localhost:8000');
+
+    $('#enviar_mensagem').click(function () {
+        socket.emit(
+            'msgParaServidor',
+            {
+                apelido: $('#apelido').val(),
+                mensagem: $('#mensagem').val(),
+                apelido_atualizado_nos_clientes: $('#apelido_atualizado_nos_clientes').val()
+            }
+        );
+
+        $('#apelido_atualizado_nos_clientes').val(1);
+    })
+
     socket.on('msgParaCliente', function (data) {
         var html = '';
 
@@ -138,6 +137,18 @@
 
         $('#dialogos').append(html);
     });
+
+    socket.on('participantesParaClientes', function (data) {
+        var html = '';
+
+        html += '<span class="participante">';
+        html += data.apelido;
+        html += '</span>'
+
+        $('#pessoas').append(html);
+    });
+
+
 </script>
 </body>
 </html>
